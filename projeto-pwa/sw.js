@@ -1,49 +1,58 @@
-const CACHE_NAME = "meu-pwa-v1";
+const CACHE_NAME = 'pwa-cache-v2';
 
-// arquivos para cache
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/style.css",
-  "/app.js",
-  "/offline.html"
+  '/',
+  '/index.html',
+  '/offline.html',
+  '/style.css',
+  '/app.js',
+  '/manifest.json'
 ];
 
-// INSTALL → salva cache inicial
-self.addEventListener("install", event => {
+// Instalação
+self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// ACTIVATE → limpa caches antigos
-self.addEventListener("activate", event => {
+// Ativação
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
+    caches.keys().then(keys => {
+      return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
         })
-      )
-    )
+      );
+    })
   );
 });
 
-// FETCH → estratégia híbrida
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        return response;
-      })
-      .catch(() =>
-        caches.match(event.request)
-          .then(resp => resp || caches.match("/offline.html"))
-      )
-  );
+// Fetch (offline + API cache)
+self.addEventListener('fetch', event => {
+  if (event.request.url.includes('jsonplaceholder')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, clone);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          return response || fetch(event.request)
+            .catch(() => caches.match('/offline.html'));
+        })
+    );
+  }
 });

@@ -61,3 +61,18 @@ document.getElementById("toggleTheme").addEventListener("click", () => {
 
 // inicial
 carregarDados();
+function updateStatus() {
+  const status = document.getElementById('status');
+  if (navigator.onLine) {
+    status.textContent = 'Online';
+    status.style.background = 'green';
+  } else {
+    status.textContent = 'Offline';
+    status.style.background = 'red';
+  }
+}
+
+window.addEventListener('online', updateStatus);
+window.addEventListener('offline', updateStatus);
+
+updateStatus();
