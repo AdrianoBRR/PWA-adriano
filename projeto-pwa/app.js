@@ -1,66 +1,17 @@
-// REGISTRO DO SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("SW registrado"))
-    .catch(err => console.log("Erro SW:", err));
+const lista = document.getElementById('lista');
+const loader = document.getElementById('loader');
+const toast = document.getElementById('toast');
+
+function showLoader(show) {
+  loader.classList.toggle('hidden', !show);
 }
 
-// STATUS ONLINE/OFFLINE
-const statusDiv = document.getElementById("status");
-
-function atualizarStatus() {
-  if (navigator.onLine) {
-    statusDiv.textContent = "Online";
-    statusDiv.className = "online";
-  } else {
-    statusDiv.textContent = "Offline";
-    statusDiv.className = "offline";
-  }
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 2000);
 }
 
-window.addEventListener("online", atualizarStatus);
-window.addEventListener("offline", atualizarStatus);
-
-atualizarStatus();
-
-// API + CACHE
-const lista = document.getElementById("lista");
-
-async function carregarDados() {
-  try {
-    const resposta = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
-    const dados = await resposta.json();
-
-    lista.innerHTML = "";
-    dados.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = item.title;
-      lista.appendChild(li);
-    });
-
-    localStorage.setItem("dados", JSON.stringify(dados));
-
-  } catch {
-    // OFFLINE → usa cache
-    const dados = JSON.parse(localStorage.getItem("dados")) || [];
-    lista.innerHTML = "";
-    dados.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = "(Offline) " + item.title;
-      lista.appendChild(li);
-    });
-  }
-}
-
-document.getElementById("btnAtualizar").addEventListener("click", carregarDados);
-
-// TEMA CLARO/ESCURO
-document.getElementById("toggleTheme").addEventListener("click", () => {
-  document.body.classList.toggle("light");
-});
-
-// inicial
-carregarDados();
 function updateStatus() {
   const status = document.getElementById('status');
   if (navigator.onLine) {
@@ -76,3 +27,26 @@ window.addEventListener('online', updateStatus);
 window.addEventListener('offline', updateStatus);
 
 updateStatus();
+
+async function carregarDados() {
+  showLoader(true);
+  lista.innerHTML = '';
+
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+    const data = await response.json();
+
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.title;
+      lista.appendChild(li);
+    });
+
+    showToast('Dados atualizados 🚀');
+
+  } catch (error) {
+    showToast('Sem internet 😢');
+  }
+
+  showLoader(false);
+}

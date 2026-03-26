@@ -2,11 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Meu PWA - Adriano</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#121212">
-
+  <title>PWA Adriano</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -14,22 +11,28 @@
 <body>
 
 <header>
-  <h1>Meu App PWA</h1>
-  <button id="toggleTheme">🌙/☀️</button>
+  🚀 Meu App PWA
 </header>
 
-<div id="status" class="offline">Offline</div>
+<div id="status" class="status">Online</div>
 
 <main>
   <h2>Dados da API</h2>
-  <button id="btnAtualizar">Atualizar Dados</button>
+
+  <button onclick="carregarDados()">Atualizar Dados</button>
+
+  <div id="loader" class="loader hidden"></div>
+
   <ul id="lista"></ul>
 </main>
 
+<div id="toast" class="toast hidden"></div>
+
 <footer>
-  <p>Desenvolvido por Adriano 🚀</p>
+  Desenvolvido por Adriano 🚀
 </footer>
 
 <script src="app.js"></script>
+
 </body>
 </html>
