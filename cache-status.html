@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Status do Cache</title>
+</head>
+<body>
+  <h1>Cache Debug</h1>
+  <ul id="cacheList"></ul>
+
+  <script>
+    caches.keys().then(names => {
+      const ul = document.getElementById("cacheList");
+      names.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        ul.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>
